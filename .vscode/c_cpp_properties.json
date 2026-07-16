@@ -1,0 +1,41 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                // 工程本地目录
+                "${workspaceFolder}/Source",
+                "${workspaceFolder}/Hardware",
+                "${workspaceFolder}/BSP",
+                "${workspaceFolder}/BSP/INC",
+                "${workspaceFolder}/BSP/LCD",
+                "${workspaceFolder}/BSP/SRC",
+                // ARMClang 标准库头文件（解决 stdint.h 找不到）
+                "D:/APP/Keil_v5/ARM/ARMCLANG/include",
+               
+                // TI SDK 核心根目录
+                "E:/ti/mspm0_sdk_2_02_00_05/source",
+                // TI 驱动库头文件
+                "E:/ti/mspm0_sdk_2_02_00_05/source/ti/driverlib",
+                // CMSIS 内核头文件
+                "E:/ti/mspm0_sdk_2_02_00_05/source/third_party/CMSIS/Core/Include"
+            ],
+            "defines": [
+                "__MSPM0G3507__",
+                "__ARM_ARCH_6M__",
+                "__STDC_VERSION__=201112L"
+            ],
+            "cStandard": "c11",
+            "intelliSenseMode": "windows-clang-x86",
+            "compilerPath": "",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "E:/ti/mspm0_sdk_2_02_00_05/source/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}
