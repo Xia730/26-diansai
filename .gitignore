@@ -1,0 +1,18 @@
+# Keil MDK build artifacts
+keil/Objects/
+keil/*.uvguix.*
+keil/*.bak
+keil/JLinkLog.txt
+keil/JLinkSettings.ini
+keil/EventRecorderStub.scvd
+keil/.vscode/
+keil/*.map
+keil/*.lnp
+keil/*.htm
+keil/*.axf
+keil/*.dep
+keil/*.build_log.htm
+
+# Misc
+*.dot
+Event.dot
