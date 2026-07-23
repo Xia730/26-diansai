@@ -16,3 +16,5 @@ keil/*.build_log.htm
 # Misc
 *.dot
 Event.dot
+
+keil/*.lst

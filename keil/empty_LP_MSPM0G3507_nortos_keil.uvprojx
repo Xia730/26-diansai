@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>__MSPM0G3507__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\hardware</IncludePath>
+              <IncludePath>..\..\source\third_party\CMSIS\Core\Include;..\..\source;..\app;..\bsp;..\config;..\drivers;..\motor;..\drivers\Fusion;..\..\7.23ds</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -382,102 +382,195 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Source</GroupName>
+          <GroupName>starup</GroupName>
           <Files>
-            <File>
-              <FileName>empty.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../empty.c</FilePath>
-            </File>
-            <File>
-              <FileName>empty.syscfg</FileName>
-              <FileType>5</FileType>
-              <FilePath>../empty.syscfg</FilePath>
-            </File>
             <File>
               <FileName>startup_mspm0g350x_uvision.s</FileName>
               <FileType>2</FileType>
-              <FilePath>startup_mspm0g350x_uvision.s</FilePath>
-            </File>
-            <File>
-              <FileName>ti_msp_dl_config.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../ti_msp_dl_config.c</FilePath>
-            </File>
-            <File>
-              <FileName>ti_msp_dl_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>../ti_msp_dl_config.h</FilePath>
+              <FilePath>..\startup\startup_mspm0g350x_uvision.s</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>hardware</GroupName>
+          <GroupName>config</GroupName>
           <Files>
             <File>
-              <FileName>uart_vision.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\uart_vision.c</FilePath>
+              <FileName>empty.syscfg</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\empty.syscfg</FilePath>
             </File>
             <File>
-              <FileName>uart_vision.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\uart_vision.h</FilePath>
+              <FileName>ti_msp_dl_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ti_msp_dl_config.c</FilePath>
             </File>
+            <File>
+              <FileName>ti_msp_dl_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\ti_msp_dl_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>bsp</GroupName>
+          <Files>
             <File>
               <FileName>board.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\board.c</FilePath>
+              <FilePath>..\bsp\board.c</FilePath>
             </File>
             <File>
               <FileName>board.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\board.h</FilePath>
+              <FilePath>..\bsp\board.h</FilePath>
             </File>
             <File>
-              <FileName>lcd_port.c</FileName>
+              <FileName>uart_vision.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\lcd_port.c</FilePath>
+              <FilePath>..\bsp\uart_vision.c</FilePath>
             </File>
             <File>
-              <FileName>lcd_port.h</FileName>
+              <FileName>uart_vision.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\lcd_port.h</FilePath>
+              <FilePath>..\bsp\uart_vision.h</FilePath>
             </File>
+            <File>
+              <FileName>interrupt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\interrupt.c</FilePath>
+            </File>
+            <File>
+              <FileName>interrupt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\interrupt.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>drivers</GroupName>
+          <Files>
             <File>
               <FileName>lcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\lcd.c</FilePath>
+              <FilePath>..\drivers\lcd.c</FilePath>
             </File>
             <File>
               <FileName>lcd.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\lcd.h</FilePath>
+              <FilePath>..\drivers\lcd.h</FilePath>
             </File>
             <File>
               <FileName>lcd_front.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\lcd_front.h</FilePath>
+              <FilePath>..\drivers\lcd_front.h</FilePath>
             </File>
             <File>
-              <FileName>Emm_V5.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Emm_V5.h</FilePath>
-            </File>
-            <File>
-              <FileName>Emm_V5.c</FileName>
+              <FileName>lcd_port.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Emm_V5.c</FilePath>
+              <FilePath>..\drivers\lcd_port.c</FilePath>
             </File>
             <File>
-              <FileName>tracking.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\tracking.c</FilePath>
-            </File>
-            <File>
-              <FileName>tracking.h</FileName>
+              <FileName>lcd_port.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\tracking.h</FilePath>
+              <FilePath>..\drivers\lcd_port.h</FilePath>
+            </File>
+            <File>
+              <FileName>imu660rb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\imu660rb.c</FilePath>
+            </File>
+            <File>
+              <FileName>imu660rb.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\imu660rb.h</FilePath>
+            </File>
+            <File>
+              <FileName>lsm6dsr_reg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\lsm6dsr_reg.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsm6dsr_reg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\lsm6dsr_reg.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>motor</GroupName>
+        </Group>
+        <Group>
+          <GroupName>app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\main.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>fusion</GroupName>
+          <Files>
+            <File>
+              <FileName>Fusion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\Fusion.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionAhrs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\Fusion\FusionAhrs.c</FilePath>
+            </File>
+            <File>
+              <FileName>FusionAhrs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionAhrs.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionAxes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionAxes.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionCalibration.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionCalibration.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionCompass.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\Fusion\FusionCompass.c</FilePath>
+            </File>
+            <File>
+              <FileName>FusionCompass.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionCompass.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionConvention.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionConvention.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionMath.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionMath.h</FilePath>
+            </File>
+            <File>
+              <FileName>FusionOffset.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\Fusion\FusionOffset.c</FilePath>
+            </File>
+            <File>
+              <FileName>FusionOffset.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\FusionOffset.h</FilePath>
+            </File>
+            <File>
+              <FileName>LICENSE.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\Fusion\LICENSE.md</FilePath>
             </File>
           </Files>
         </Group>

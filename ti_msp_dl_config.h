@@ -147,13 +147,36 @@ extern "C" {
 #define GPIO_SPI_LCD_SCLK_PIN                                     DL_GPIO_PIN_9
 #define GPIO_SPI_LCD_IOMUX_SCLK                                 (IOMUX_PINCM26)
 #define GPIO_SPI_LCD_IOMUX_SCLK_FUNC                 IOMUX_PINCM26_PF_SPI1_SCLK
-#define GPIO_SPI_LCD_CS0_PORT                                             GPIOA
-#define GPIO_SPI_LCD_CS0_PIN                                      DL_GPIO_PIN_2
-#define GPIO_SPI_LCD_IOMUX_CS0                                   (IOMUX_PINCM7)
-#define GPIO_SPI_LCD_IOMUX_CS0_FUNC                    IOMUX_PINCM7_PF_SPI1_CS0
+#define GPIO_SPI_LCD_CS0_PORT                                             GPIOB
+#define GPIO_SPI_LCD_CS0_PIN                                     DL_GPIO_PIN_20
+#define GPIO_SPI_LCD_IOMUX_CS0                                  (IOMUX_PINCM48)
+#define GPIO_SPI_LCD_IOMUX_CS0_FUNC                   IOMUX_PINCM48_PF_SPI1_CS0
+/* Defines for SPI_IMU660RB */
+#define SPI_IMU660RB_INST                                                  SPI0
+#define SPI_IMU660RB_INST_IRQHandler                            SPI0_IRQHandler
+#define SPI_IMU660RB_INST_INT_IRQN                                SPI0_INT_IRQn
+#define GPIO_SPI_IMU660RB_PICO_PORT                                       GPIOB
+#define GPIO_SPI_IMU660RB_PICO_PIN                               DL_GPIO_PIN_17
+#define GPIO_SPI_IMU660RB_IOMUX_PICO                            (IOMUX_PINCM43)
+#define GPIO_SPI_IMU660RB_IOMUX_PICO_FUNC            IOMUX_PINCM43_PF_SPI0_PICO
+#define GPIO_SPI_IMU660RB_POCI_PORT                                       GPIOA
+#define GPIO_SPI_IMU660RB_POCI_PIN                               DL_GPIO_PIN_13
+#define GPIO_SPI_IMU660RB_IOMUX_POCI                            (IOMUX_PINCM35)
+#define GPIO_SPI_IMU660RB_IOMUX_POCI_FUNC            IOMUX_PINCM35_PF_SPI0_POCI
+/* GPIO configuration for SPI_IMU660RB */
+#define GPIO_SPI_IMU660RB_SCLK_PORT                                       GPIOA
+#define GPIO_SPI_IMU660RB_SCLK_PIN                               DL_GPIO_PIN_12
+#define GPIO_SPI_IMU660RB_IOMUX_SCLK                            (IOMUX_PINCM34)
+#define GPIO_SPI_IMU660RB_IOMUX_SCLK_FUNC            IOMUX_PINCM34_PF_SPI0_SCLK
 
 
 
+/* Port definition for Pin Group GPIO_KEY */
+#define GPIO_KEY_PORT                                                    (GPIOA)
+
+/* Defines for PIN_KEY1: GPIOA.18 with pinCMx 40 on package pin 11 */
+#define GPIO_KEY_PIN_KEY1_PIN                                   (DL_GPIO_PIN_18)
+#define GPIO_KEY_PIN_KEY1_IOMUX                                  (IOMUX_PINCM40)
 /* Port definition for Pin Group LED1 */
 #define LED1_PORT                                                        (GPIOA)
 
@@ -178,6 +201,18 @@ extern "C" {
 /* Defines for BLK: GPIOB.26 with pinCMx 57 on package pin 28 */
 #define SPI_LCD1_BLK_PIN                                        (DL_GPIO_PIN_26)
 #define SPI_LCD1_BLK_IOMUX                                       (IOMUX_PINCM57)
+/* Defines for PIN_IMU660RB_CS: GPIOA.2 with pinCMx 7 on package pin 42 */
+#define GPIO_IMU660RB_PIN_IMU660RB_CS_PORT                               (GPIOA)
+#define GPIO_IMU660RB_PIN_IMU660RB_CS_PIN                        (DL_GPIO_PIN_2)
+#define GPIO_IMU660RB_PIN_IMU660RB_CS_IOMUX                       (IOMUX_PINCM7)
+/* Defines for PIN_IMU660RB_INT1: GPIOB.13 with pinCMx 30 on package pin 1 */
+#define GPIO_IMU660RB_PIN_IMU660RB_INT1_PORT                             (GPIOB)
+// pins affected by this interrupt request:["PIN_IMU660RB_INT1"]
+#define GPIO_IMU660RB_INT_IRQN                                  (GPIOB_INT_IRQn)
+#define GPIO_IMU660RB_INT_IIDX                  (DL_INTERRUPT_GROUP1_IIDX_GPIOB)
+#define GPIO_IMU660RB_PIN_IMU660RB_INT1_IIDX                (DL_GPIO_IIDX_DIO13)
+#define GPIO_IMU660RB_PIN_IMU660RB_INT1_PIN                     (DL_GPIO_PIN_13)
+#define GPIO_IMU660RB_PIN_IMU660RB_INT1_IOMUX                    (IOMUX_PINCM30)
 
 /* clang-format on */
 
@@ -189,6 +224,7 @@ void SYSCFG_DL_I2C_OLED_init(void);
 void SYSCFG_DL_UART0_init(void);
 void SYSCFG_DL_UART3_init(void);
 void SYSCFG_DL_SPI_LCD_init(void);
+void SYSCFG_DL_SPI_IMU660RB_init(void);
 
 
 bool SYSCFG_DL_saveConfiguration(void);
