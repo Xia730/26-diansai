@@ -378,9 +378,9 @@ ARM Macro Assembler    Page 6
               00000000 
 Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M0+ --dep
 end=.\objects\startup_mspm0g350x_uvision.d -o.\objects\startup_mspm0g350x_uvisi
-on.o --predefine="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="_
-_UVISION_VERSION SETA 539" --predefine="__MSPM0G3507__ SETA 1" --list=.\startup
-_mspm0g350x_uvision.lst ..\startup\startup_mspm0g350x_uvision.s
+on.o --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 539" -
+-predefine="__MSPM0G3507__ SETA 1" --list=.\startup_mspm0g350x_uvision.lst ..\s
+tartup\startup_mspm0g350x_uvision.s
 
 
 
@@ -848,4 +848,4 @@ Symbol: __main
       At line 140 in file ..\startup\startup_mspm0g350x_uvision.s
 Comment: __main used once
 1 symbol
-382 symbols in table
+381 symbols in table

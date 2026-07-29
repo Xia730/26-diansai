@@ -18,6 +18,9 @@ void Uart_SendString(UART_Regs *uart, const char *str);
 void Uart_SendArray(UART_Regs *uart, const uint8_t *buf, uint16_t length);
 
 /* 使用可变参数实现的类 printf 函数 */
-int my_printf(const char *format, ...);
+int my_printf(UART_Regs *uart,const char *format, ...);
+
+
+
 
 #endif

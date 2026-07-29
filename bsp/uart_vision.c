@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define printf_uart UART0
+
 /*------------------------------------------------
 作用    : 指定串口发送字符
 参数    : uart: 串口句柄
@@ -61,7 +61,7 @@ void Uart_SendArray(UART_Regs *uart, const uint8_t *buf, uint16_t length)
 参数    : ...:    可变参数
 返回值  : 发送的字符串长度
 ------------------------------------------------*/
-int my_printf(const char *format, ...)
+int my_printf(UART_Regs *uart,const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -73,7 +73,8 @@ int my_printf(const char *format, ...)
     va_end(args);
 
     // 发送格式化后的字符串
-    Uart_SendString(printf_uart, buffer);
+    Uart_SendString(uart, buffer);
 
     return len;
 }
+

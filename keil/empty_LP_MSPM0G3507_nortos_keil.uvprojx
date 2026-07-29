@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>3</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -412,6 +412,51 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>params.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\params.c</FilePath>
+            </File>
+            <File>
+              <FileName>params.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\params.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\tasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\tasks.h</FilePath>
+            </File>
+            <File>
+              <FileName>menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\app\menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>menu.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\app\menu.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>bsp</GroupName>
           <Files>
             <File>
@@ -494,18 +539,70 @@
               <FileType>5</FileType>
               <FilePath>..\drivers\lsm6dsr_reg.h</FilePath>
             </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\key.h</FilePath>
+            </File>
+            <File>
+              <FileName>beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>beep.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\beep.h</FilePath>
+            </File>
+            <File>
+              <FileName>trailing.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\trailing.c</FilePath>
+            </File>
+            <File>
+              <FileName>trailing.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\trailing.h</FilePath>
+            </File>
+            <File>
+              <FileName>zigbee.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\zigbee.c</FilePath>
+            </File>
+            <File>
+              <FileName>zigbee.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\zigbee.h</FilePath>
+            </File>
+            <File>
+              <FileName>maxicam.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\drivers\maxicam.c</FilePath>
+            </File>
+            <File>
+              <FileName>maxicam.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\drivers\maxicam.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>motor</GroupName>
-        </Group>
-        <Group>
-          <GroupName>app</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>Motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\app\main.c</FilePath>
+              <FilePath>..\motor\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\motor\Motor.h</FilePath>
             </File>
           </Files>
         </Group>

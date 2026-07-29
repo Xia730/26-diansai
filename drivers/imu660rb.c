@@ -103,6 +103,7 @@ static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp, uint16_t 
     cs_low();
     reg |= 0x80;                     // 读操作：bit7 置 1
     spi_transfer_byte(reg);          // 发送寄存器地址
+    delay_MS(1);                     // 等待 LSM6DSR 切换数据方向
     while (len--) {
         *bufp++ = spi_transfer_byte(0);  // 发送 dummy 同时接收
     }
@@ -272,14 +273,15 @@ void Read_IMU660RB(void)
  */
 static uint8_t spi_transfer_byte(uint8_t data)
 {
-	uint8_t read_data = 0;
+    while (DL_SPI_isBusy(SPI_IMU660RB_INST));
 
     DL_SPI_transmitData8(SPI_IMU660RB_INST, data);
-    while(DL_SPI_isRXFIFOEmpty(SPI_IMU660RB_INST));
-    read_data = DL_SPI_receiveData8(SPI_IMU660RB_INST);
-    while(DL_SPI_isBusy(SPI_IMU660RB_INST));
 
-    return read_data;
+    while (!DL_SPI_isTXFIFOEmpty(SPI_IMU660RB_INST));
+    while (DL_SPI_isBusy(SPI_IMU660RB_INST));
+    while (DL_SPI_isRXFIFOEmpty(SPI_IMU660RB_INST));
+
+    return DL_SPI_receiveData8(SPI_IMU660RB_INST);
 }
 
 /**
@@ -287,7 +289,7 @@ static uint8_t spi_transfer_byte(uint8_t data)
  */
 static void cs_low(void)
 {
-	DL_GPIO_clearPins(GPIO_IMU660RB_PIN_IMU660RB_INT1_PORT, GPIO_IMU660RB_PIN_IMU660RB_CS_PIN);
+	DL_GPIO_clearPins(GPIO_IMU660RB_PORT, GPIO_IMU660RB_PIN_IMU660RB_CS_PIN);
 }
 
 /**
@@ -295,7 +297,7 @@ static void cs_low(void)
  */
 static void cs_high(void)
 {
-	DL_GPIO_setPins(GPIO_IMU660RB_PIN_IMU660RB_INT1_PORT, GPIO_IMU660RB_PIN_IMU660RB_CS_PIN);
+	DL_GPIO_setPins(GPIO_IMU660RB_PORT, GPIO_IMU660RB_PIN_IMU660RB_CS_PIN);
 }
 
 /**
@@ -303,6 +305,6 @@ static void cs_high(void)
  */
 static void delay_MS(uint32_t ms)
 {
-	mspm0_delay_ms(ms);
+	delay_ms(ms);
 
 }
