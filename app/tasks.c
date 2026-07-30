@@ -5,6 +5,7 @@
 
 extern volatile uint32_t sys_tick;
 extern int32_t speed_l, speed_r;
+extern volatile int32_t enc_count_l, enc_count_r;
 
 /* ================================================
  *  全局变量定义
@@ -51,10 +52,12 @@ static uint8_t current_idx = 0;
 
 /* ──── 任务1：循迹 + 一圈计时停车 ────
  *
- *  K3 启动 → 等 12 路全黑 → 开始计时循迹
- *  → 检测到 A 点横线（带消抖） → 停车显示时间
+ *  K3 启动 → 记录编码器起点 → 开始计时循迹
+ *  0~16.5s：正常速度，不检测停止线
+ *  16.5s后：线性降速
+ *    编码器增量达标 + 传感器检测到停止线 → 停车显示时间
  *
- *  状态机：WAIT(等全黑启动) → LAP(循迹) → DONE(停车)
+ *  状态机：WAIT(启动) → LAP(循迹) → DONE(停车)
  */
 #define T1_WAIT  0
 #define T1_LAP   1
@@ -63,37 +66,56 @@ static uint8_t current_idx = 0;
 static uint32_t t1_start_tick = 0;
 static uint32_t t1_final_time = 0;
 static uint8_t  t1_phase = 0;
+static int32_t  t1_enc_l_start = 0;
+static int32_t  t1_enc_r_start = 0;
 
 static void task1_init(void)
 {
     t1_start_tick = 0;
     t1_phase = T1_WAIT;
+    t1_enc_l_start = enc_count_l;
+    t1_enc_r_start = enc_count_r;
 }
 
 static void task1_run(uint8_t *s, uint32_t t)
 {
-    // 比赛模式：启停 + 计时
+    uint32_t elapsed = t - t1_start_tick;
+    int32_t enc_avg = ((enc_count_l - t1_enc_l_start) +
+                        (enc_count_r - t1_enc_r_start)) / 2;
+
+    // 状态机
     switch (t1_phase) {
     case T1_WAIT:
-        if (Trail_AllBlack(s)) {
-            t1_start_tick = t;
-            t1_phase = T1_LAP;
-        }
-        Motor_Control(1, 0);
-        Motor_Control(2, 0);
-        return;
+        t1_start_tick = t;
+        t1_phase = T1_LAP;
+        break;
     case T1_LAP:
-        if (Trail_DetectStopLine(s)) t1_phase = T1_DONE;
+        if (Trail_DetectStopLine(s) || enc_avg >= 10050)
+            t1_phase = T1_DONE;
         break;
     case T1_DONE:
-        t1_final_time = t - t1_start_tick;
+        t1_final_time = elapsed;
         TASK_Stop();
         return;
     }
 
+    // 缓启动：1秒内从0线性升到目标速度
+    // 编码器 ≥9500 开始降速，到 10050 时降到 200
+    int16_t eff_speed;
+    if (elapsed < 1000) {
+        eff_speed = (int16_t)((int32_t)param_base_speed * elapsed / 1000);
+    } else if (enc_avg >= 9500) {
+        int32_t ramp = enc_avg - 9500;
+        int32_t reduction = ((int32_t)param_base_speed - 200) * ramp / 550;
+        eff_speed = (int16_t)param_base_speed - (int16_t)reduction;
+        if (eff_speed < 200) eff_speed = 200;
+    } else {
+        eff_speed = (int16_t)param_base_speed;
+    }
+
     int16_t diff = Trail_Steering_Compute(s, t);
-    int16_t target_l = (int16_t)param_base_speed - diff;
-    int16_t target_r = (int16_t)param_base_speed + diff;
+    int16_t target_l = eff_speed - diff;
+    int16_t target_r = eff_speed + diff;
 
     if (target_l < -1000) target_l = -1000;
     if (target_l >  1000) target_l =  1000;
@@ -109,96 +131,120 @@ static void task1_draw(void)
 {
     lcd_printf(0, 2, BLUE, WHITE, "Trail 1 Lap");
     if (t1_phase == T1_WAIT) {
-        lcd_printf(0, 24, BLACK, WHITE, "Waiting...");
+        lcd_printf(0, 30, BLACK, WHITE, "Waiting...");
     } else if (t1_phase == T1_DONE) {
-        lcd_printf(0, 24, RED, WHITE, "%lu.%02lu s  DONE",
+        lcd_printf(0, 30, RED, WHITE, "%lu.%02lu s  DONE",
                    t1_final_time / 1000, (t1_final_time % 1000) / 10);
     } else {
         uint32_t elapse = sys_tick - t1_start_tick;
-        lcd_printf(0, 24, BLACK, WHITE, "%lu.%02lu s",
+        lcd_printf(0, 30, BLACK, WHITE, "%lu.%02lu s",
                    elapse / 1000, (elapse % 1000) / 10);
+        // 编码器进度 + 穿越次数
+        int32_t enc_avg = ((enc_count_l - t1_enc_l_start) +
+                            (enc_count_r - t1_enc_r_start)) / 2;
+        lcd_printf(0, 56, BLACK, WHITE, "Enc:%d",
+                   enc_avg);
     }
-    lcd_printf(0, 44, BLACK, WHITE,
+    lcd_printf(0, 84, BLACK, WHITE,
                "Spd:%d L:%d R:%d", param_base_speed, speed_l, speed_r);
-    lcd_printf(0, 66, GRAY, WHITE, "K3 Pause K4 Stop");
+    lcd_printf(0, 112, GRAY, WHITE, "K3 Pause K4 Stop");
 }
 
-/* ──── 任务2：速度环直行测试 ──── */
-static void task2_init(void) {}
+/* ──── 任务2：循迹 + 编码器5000停止 ──── */
+static uint32_t t2_start_tick = 0;
+static int32_t  t2_enc_start = 0;
+
+static void task2_init(void)
+{
+    t2_start_tick = 0;
+    t2_enc_start = (enc_count_l + enc_count_r) / 2;
+}
+
 static void task2_run(uint8_t *s, uint32_t t)
 {
-    (void)s;
-    Motor_SpeedLoop((int16_t)param_base_speed,
-                    (int16_t)param_base_speed, t);
-}
-static void task2_stop(void) {}
+    uint32_t elapsed = t - t2_start_tick;
+    int32_t  enc_avg = ((enc_count_l + enc_count_r) / 2) - t2_enc_start;
 
-/* ──── 任务3：一圈计时 ────
- *
- *  K3 启动 → 开始计时 → 循迹一圈 → 检测到 A 点停止线 → 自动停车
- *  显示已用时间
- *
- *  状态机：
- *    PHASE_START    刚启动，等传感器离开起始横线
- *    PHASE_LAP      循迹中，等待回到 A 点
- *    PHASE_DONE     完成，停车显示时间
- */
-#define PHASE_START  0
-#define PHASE_LAP    1
-#define PHASE_DONE   2
-
-static uint32_t lap_start_tick = 0;
-static uint8_t  lap_phase = 0;
-
-static void task3_init(void)
-{
-    lap_start_tick = 0;
-    lap_phase = PHASE_START;
-}
-
-static void task3_run(uint8_t *s, uint32_t t)
-{
-    /* 首次运行记录起始时间 */
-    if (lap_start_tick == 0) {
-        lap_start_tick = t;
-    }
-
-    uint32_t elapsed = t - lap_start_tick;
-
-    /* ── 状态机 ── */
-    switch (lap_phase) {
-
-    case PHASE_START:
-        /* 先离开起始横线再开始等下一圈 */
-        {
-            uint8_t cnt = 0;
-            for (uint8_t i = 0; i < 12; i++) if (s[i]) cnt++;
-            if (cnt < 3) lap_phase = PHASE_LAP;
-        }
-        /* 循迹不能停 */
-        break;
-
-    case PHASE_LAP:
-        if (Trail_DetectStopLine(s)) {
-            lap_phase = PHASE_DONE;
-        }
-        break;
-
-    case PHASE_DONE:
+    if (enc_avg >= 5000) {
         TASK_Stop();
         return;
     }
 
-    /* ── 正常循迹 ── */
-    int16_t diff = Trail_Steering_Compute(s, t);
-    int16_t target_l = (int16_t)param_base_speed - diff;
-    int16_t target_r = (int16_t)param_base_speed + diff;
+    // 缓启动 + 编码器降速
+    int16_t eff_speed;
+    if (elapsed < 1000) {
+        eff_speed = (int16_t)((int32_t)param_base_speed * elapsed / 1000);
+    } else if (enc_avg >= 4000) {
+        int32_t ramp = enc_avg - 4000;
+        int32_t reduction = (int32_t)param_base_speed * ramp / 1000;
+        eff_speed = (int16_t)param_base_speed - (int16_t)reduction;
+        if (eff_speed < 0) eff_speed = 0;
+    } else {
+        eff_speed = (int16_t)param_base_speed;
+    }
 
+    int16_t diff = Trail_Steering_Compute(s, t);
+    int16_t target_l = eff_speed - diff;
+    int16_t target_r = eff_speed + diff;
     if (target_l < -1000) target_l = -1000;
     if (target_l >  1000) target_l =  1000;
     if (target_r < -1000) target_r = -1000;
     if (target_r >  1000) target_r =  1000;
+    Motor_SpeedLoop(target_l, target_r, t);
+}
 
+static void task2_stop(void) {}
+
+static void task2_draw(void)
+{
+    int32_t enc_avg = ((enc_count_l + enc_count_r) / 2) - t2_enc_start;
+    lcd_printf(0, 2, BLUE, WHITE, "A->B");
+    lcd_printf(0, 30, BLACK, WHITE, "Enc:%d/5000", enc_avg);
+    lcd_printf(0, 58, BLACK, WHITE,
+               "Spd:%d L:%d R:%d", param_base_speed, speed_l, speed_r);
+    lcd_printf(0, 86, GRAY, WHITE, "K3 Pause K4 Stop");
+}
+
+/* ──── 任务3：循迹 + 编码器11000停止 ──── */
+static uint32_t t3_start_tick = 0;
+static int32_t  t3_enc_start = 0;
+
+static void task3_init(void)
+{
+    t3_start_tick = 0;
+    t3_enc_start = (enc_count_l + enc_count_r) / 2;
+}
+
+static void task3_run(uint8_t *s, uint32_t t)
+{
+    uint32_t elapsed = t - t3_start_tick;
+    int32_t  enc_avg = ((enc_count_l + enc_count_r) / 2) - t3_enc_start;
+
+    if (enc_avg >= 11000) {
+        TASK_Stop();
+        return;
+    }
+
+    // 缓启动 + 编码器降速到0
+    int16_t eff_speed;
+    if (elapsed < 1000) {
+        eff_speed = (int16_t)((int32_t)param_base_speed * elapsed / 1000);
+    } else if (enc_avg >= 9500) {
+        int32_t ramp = enc_avg - 9500;
+        int32_t reduction = (int32_t)param_base_speed * ramp / 1500;
+        eff_speed = (int16_t)param_base_speed - (int16_t)reduction;
+        if (eff_speed < 0) eff_speed = 0;
+    } else {
+        eff_speed = (int16_t)param_base_speed;
+    }
+
+    int16_t diff = Trail_Steering_Compute(s, t);
+    int16_t target_l = eff_speed - diff;
+    int16_t target_r = eff_speed + diff;
+    if (target_l < -1000) target_l = -1000;
+    if (target_l >  1000) target_l =  1000;
+    if (target_r < -1000) target_r = -1000;
+    if (target_r >  1000) target_r =  1000;
     Motor_SpeedLoop(target_l, target_r, t);
 }
 
@@ -206,39 +252,21 @@ static void task3_stop(void) {}
 
 static void task3_draw(void)
 {
-    lcd_printf(0, 2, BLUE, WHITE, "Lap Timer");
-    lcd_printf(0, 24, BLACK, WHITE, "%lu.%02lu s",
-               (lap_start_tick ? (sys_tick - lap_start_tick) / 1000 : 0),
-               (lap_start_tick ? ((sys_tick - lap_start_tick) % 1000) / 10 : 0));
-    lcd_printf(0, 44, BLACK, WHITE,
+    int32_t enc_avg = ((enc_count_l + enc_count_r) / 2) - t3_enc_start;
+    lcd_printf(0, 2, BLUE, WHITE, "A->A");
+    lcd_printf(0, 30, BLACK, WHITE, "Enc:%d/11000", enc_avg);
+    lcd_printf(0, 58, BLACK, WHITE,
                "Spd:%d L:%d R:%d", param_base_speed, speed_l, speed_r);
-    lcd_printf(0, 66, GRAY, WHITE, "K3 Pause K4 Stop");
+    lcd_printf(0, 86, GRAY, WHITE, "K3 Pause K4 Stop");
 }
-
-/* ──── 任务4~5：空模板 ──── */
-static void task4_init(void) {}
-static void task4_run(uint8_t *s, uint32_t t) { (void)s; (void)t; }
-static void task4_stop(void) {}
-
-static void task5_init(void) {}
-static void task5_run(uint8_t *s, uint32_t t) { (void)s; (void)t; }
-static void task5_stop(void) {}
 
 /* ================================================
  *  任务注册表
- *
- *  把上面5个任务的 init/run/stop 函数注册到这里
- *  菜单选"任务1"时，TASK_Select(0) 就会调用
- *  tasks[0].init → tasks[0].run → ... → tasks[0].stop
- *
- *  TASK_COUNT = 5 定义在 params.h
  * ================================================ */
 const Task tasks[TASK_COUNT] = {
     { task1_init, task1_run, task1_stop, task1_draw },
-    { task2_init, task2_run, task2_stop, 0 },
+    { task2_init, task2_run, task2_stop, task2_draw },
     { task3_init, task3_run, task3_stop, task3_draw },
-    { task4_init, task4_run, task4_stop, 0 },
-    { task5_init, task5_run, task5_stop, 0 },
 };
 
 /* ================================================

@@ -88,13 +88,13 @@ void UART3_SendStates(volatile uint8_t bin_array[12])
  *      correction = KP * position + KD * (position - last_position)
  *
  *    Step3 — 丢线恢复
- *      连续丢线 >3 次 → 根据 last_sum 方向自旋寻线
+ *      连续丢线 >3 次 → 根据 last_sum 方9向自旋寻线
  *
  *  ★ tuning：
  *    KP 调转向力度（太大=蛇形，太小=冲出）
  *    KD 抑制震荡（一般为 0）
  * ================================================ */
-#define TRAIL_KP          18.0f
+#define TRAIL_KP          22.0f
 #define TRAIL_KD           2.0f
 #define TRAIL_DT           10
 #define MAX_CORRECTION     1000
@@ -156,13 +156,14 @@ int16_t Trail_Steering_Compute(const uint8_t sensor[12], uint32_t tick_ms)
     return (int16_t)correction;
 }
 
-/* ── 全黑检测 ── */
+/* ── 启停线检测（≥4 路黑） ── */
 uint8_t Trail_AllBlack(const uint8_t sensor[12])
 {
+    uint8_t cnt = 0;
     for (uint8_t i = 0; i < 12; i++) {
-        if (sensor[i] == 0) return 0;
+        if (sensor[i]) cnt++;
     }
-    return 1;
+    return (cnt >= 4) ? 1 : 0;
 }
 
 /* ── 停止线检测（带消抖） ── */
@@ -175,14 +176,14 @@ uint8_t Trail_DetectStopLine(const uint8_t sensor[12])
         if (sensor[i]) cnt++;
     }
 
-    /* 先离开（<3 黑=正常线），准备好下次检测 */
-    if (cnt < 3) {
+    /* 先离开（<2 黑=正常线），准备好下次检测 */
+    if (cnt < 2) {
         armed = 1;
         return 0;
     }
 
-    /* ≥10 黑 + 已武装 → 触发 */
-    if (cnt >= 10 && armed) {
+    /* ≥4 黑 + 已武装 → 触发 */
+    if (cnt >= 4 && armed) {
         armed = 0;
         return 1;
     }

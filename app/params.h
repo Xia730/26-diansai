@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* ── 任务数量 & 名字长度 ── */
-#define TASK_COUNT  5
+#define TASK_COUNT  3
 #define NAME_LEN    8
 
 /* ── 任务名称（K4可改，重启恢复默认） ── */
@@ -27,7 +27,8 @@ extern int32_t param_turn_speed;
 extern int32_t param_pid_p;
 extern int32_t param_pid_i;
 extern int32_t param_pid_d;
-#define PARAM_COUNT 5
+extern int32_t param_lap_enc;
+#define PARAM_COUNT 6
 
 /* ── 参数显示格式 ──
  *  FMT_INT  : 直接显示整数，如 500

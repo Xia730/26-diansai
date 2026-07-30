@@ -10,7 +10,7 @@
 - **双轴闭环控制**: Emm_V5.0 步进伺服 × 2 (Pan=地址1, Tilt=地址2)
 - **PID定点控制**: Q16.16 定点数格式, 支持方向反转与积分抗饱和
 - **状态机管理**: IDLE → SEARCHING → LOCKED → LOST 四状态自动切换
-- **LCD实时显示**: ST7735 128×160 SPI LCD 显示状态、坐标、误差、帧数
+- **LCD实时显示**: ST7789 240×240 SPI LCD 显示状态、坐标、误差、帧数
 
 ## 硬件清单
 
@@ -19,7 +19,7 @@
 | 主控 | MSPM0G3507 | Cortex-M0+, 32MHz |
 | 电机 | Emm_V5.0 闭环步进伺机 | 2个 (Pan/Tilt) |
 | 视觉 | MaixCAM2 (K230) | 320×240, 或PC模拟 |
-| 显示 | ST7735S | 128×160 SPI LCD |
+| 显示 | ST7789 | 240×240 SPI LCD |
 | 电源 | 5V/12V | 视觉模块与电机分别供电 |
 
 ## 目录结构
@@ -35,7 +35,7 @@
 ├── config/           # TI-DL配置文件
 │   ├── ti_msp_dl_config.c/h  # 外设初始化 (由SysConfig生成)
 ├── drivers/          # 驱动层
-│   ├── lcd.c/h       # ST7735 LCD图形函数
+│   ├── lcd.c/h       # ST7789 LCD图形函数
 │   ├── lcd_port.c/h  # LCD SPI端口抽象
 │   └── lcd_front.h   # 颜色/字体定义
 ├── motor/            # 电机驱动
@@ -65,7 +65,7 @@
 1. **连接硬件**:
    - UART0 (PA10/PA11): PC模拟视觉 (可选)
    - UART3 (PB2/PB3): MaixCAM2视觉模块
-   - LCD SPI: ST7735 128×160
+   - LCD SPI: ST7789 240×240
    - 电机RS485: Pan(地址1), Tilt(地址2)
 
 2. **视觉协议**:

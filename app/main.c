@@ -1,8 +1,6 @@
 #include "main.h"
 
 
-
-
 /* ================================================
  *  系统心跳
  * ================================================ */
@@ -44,29 +42,30 @@ volatile uint8_t g_10ms_flag = 0;
  * ================================================ */
 int main(void)
 {
-    SYSCFG_DL_init();
-    LCD_Init();
-    PARAM_Init();
-    MENU_Init();
-		IMU660RB_Init();
-		
-    NVIC_EnableIRQ(UART0_INST_INT_IRQN);
-    NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN);
-	NVIC_EnableIRQ(TIMER_1_INST_INT_IRQN);
-    DL_Timer_startCounter(TIMER_0_INST);
-
-    Interrupt_Init();
-	DL_TimerG_startCounter(PWM_A_INST);
-	DL_TimerG_startCounter(PWM_B_INST);
-	DL_TimerG_startCounter(TIMER_1_INST);
-	Motor_Control(1, 0);
-	Motor_Control(2, 0);
-
-    Zigbee_Init();
-    Maxicam_Init();
-	
-	//等待初始化稳定
+		SYSCFG_DL_init();
 		delay_ms(100);
+	//初始化稳定
+		LCD_Init();
+		PARAM_Init();
+		MENU_Init();
+
+
+		NVIC_EnableIRQ(UART0_INST_INT_IRQN);
+		NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN);
+		NVIC_EnableIRQ(TIMER_1_INST_INT_IRQN);
+		
+		Interrupt_Init();
+
+		DL_TimerG_startCounter(PWM_A_INST);
+		DL_TimerG_startCounter(PWM_B_INST);
+	
+		DL_Timer_startCounter(TIMER_0_INST);
+		DL_TimerG_startCounter(TIMER_1_INST);
+		
+		Motor_Control(1, 0);
+		Motor_Control(2, 0);
+	
+	
     while (1) {
 			
         /* ── 高速控制：每次循环都跑 ──

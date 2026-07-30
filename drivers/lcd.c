@@ -1,6 +1,6 @@
 /**
  * @file    lcd.c
- * @brief   ST7735 LCD 应用层 — 绘图 + 文字 + 格式化输出 (DMA)
+ * @brief   ST7789 LCD 应用层 — 绘图 + 文字 + 格式化输出 (DMA)
  */
 #include "lcd.h"
 #include "lcd_front.h"
@@ -113,10 +113,10 @@ void Draw_Circle(u16 x0, u16 y0, u8 r, u16 color)
 
 void LCD_ShowChar(u16 x, u16 y, u8 num, u16 fc, u16 bc, u8 sizey, u8 mode)
 {
-    u8  sizex = sizey / 2;
-    u16 TypefaceNum = (u16)(sizex / 8 + ((sizex % 8) ? 1 : 0)) * sizey;
+    u8  sizex = sizey / 2;       /* 12 = 24/2 */
+    u8  bytes_per_row = sizey / 12 * 2;  /* 每行 2 字节 (12 位) */
     u16 i;
-    u8  t, temp, m = 0;
+    u8  t, row;
     u16 x0 = x;
     u32 pixel_idx;
 
@@ -131,12 +131,11 @@ void LCD_ShowChar(u16 x, u16 y, u8 num, u16 fc, u16 bc, u8 sizey, u8 mode)
         u16 bcs = SWAP16(bc);
         pixel_idx = 0;
 
-        for (i = 0; i < TypefaceNum; i++) {
-            temp = ascii_1206[num][i];
-            for (t = 0; t < 8; t++) {
-                g_pixel_buf[pixel_idx++] = (temp & (0x01 << t)) ? fcs : bcs;
-                m++;
-                if (m % sizex == 0) { m = 0; break; }
+        for (row = 0; row < sizey; row++) {
+            u16 row_data = ascii_2412[num][row * 2]
+                         | ((u16)ascii_2412[num][row * 2 + 1] << 8);
+            for (t = 0; t < 12; t++) {
+                g_pixel_buf[pixel_idx++] = (row_data & (0x01 << t)) ? fcs : bcs;
             }
         }
 #if LCD_CHAR_DMA
@@ -146,13 +145,15 @@ void LCD_ShowChar(u16 x, u16 y, u8 num, u16 fc, u16 bc, u8 sizey, u8 mode)
 #endif
     } else {
         /* —— 叠加模式 (逐点) —— */
-        for (i = 0; i < TypefaceNum; i++) {
-            temp = ascii_1206[num][i];
-            for (t = 0; t < 8; t++) {
-                if (temp & (0x01 << t)) LCD_DrawPoint(x, y, fc);
+        for (row = 0; row < sizey; row++) {
+            u16 row_data = ascii_2412[num][row * 2]
+                         | ((u16)ascii_2412[num][row * 2 + 1] << 8);
+            for (t = 0; t < 12; t++) {
+                if (row_data & (0x01 << t)) LCD_DrawPoint(x, y, fc);
                 x++;
-                if ((x - x0) == sizex) { x = x0; y++; break; }
             }
+            x = x0;
+            y++;
         }
     }
 }
@@ -234,12 +235,12 @@ void lcd_printf(u16 x, u16 y, u16 fg, u16 bg,
     va_end(args);
 
     /* 先写字 — 避免白底闪现 */
-    LCD_ShowString(x, y, (const u8 *)buf, fg, bg, 12, 0);
+    LCD_ShowString(x, y, (const u8 *)buf, fg, bg, 24, 0);
 
     /* 再填本行尾部 — 清除旧字符残影 (自动填到屏幕最右边) */
     size_t len = strlen(buf);
-    u16 tail_x = x + (u16)len * 6;
+    u16 tail_x = x + (u16)len * 12;
     if (tail_x < LCD_W) {
-        LCD_Fill(tail_x, y, LCD_W, y + 12, bg);
+        LCD_Fill(tail_x, y, LCD_W, y + 24, bg);
     }
 }

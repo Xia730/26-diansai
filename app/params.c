@@ -8,10 +8,8 @@
  * ================================================ */
 char task_names[TASK_COUNT][NAME_LEN + 1] = {
     "Trail",
-    "Speed",
-    "1 Lap",
-    "Task4",
-    "Task5",
+    "A->B",
+    "A->A",
 };
 
 /* ================================================
@@ -32,6 +30,7 @@ int32_t param_turn_speed = 300;
 int32_t param_pid_p = 150;
 int32_t param_pid_i = 10;
 int32_t param_pid_d = 5;
+int32_t param_lap_enc = 10000;
 
 /* ================================================
  *  参数定义表
@@ -52,6 +51,7 @@ const ParamDef param_table[PARAM_COUNT] = {
     { "PID P",   &param_pid_p,      0, 1000, 5, FMT_DEC2 },
     { "PID I",   &param_pid_i,      0, 500, 5, FMT_DEC2 },
     { "PID D",   &param_pid_d,      0, 500, 5, FMT_DEC2 },
+    { "LapEnc",  &param_lap_enc,   100, 50000, 100, FMT_INT },
 };
 
 /* ================================================

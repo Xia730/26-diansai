@@ -22,13 +22,13 @@ extern volatile int32_t enc_count_l, enc_count_r;
 #define TITLE_COLOR DARKBLUE
 
 /* ================================================
- *  LCD 屏幕坐标布局 (128×160)
+ *  LCD 屏幕坐标布局 (240×240)
  * ================================================ */
 #define TITLE_Y     2
-#define ITEM_Y0     22
-#define ITEM_H      20
-#define HINT_Y      145
-#define BAR_Y       62
+#define ITEM_Y0     30
+#define ITEM_H      30
+#define HINT_Y      216
+#define BAR_Y       80
 #define BAR_H       16
 
 /* ================================================
@@ -47,7 +47,7 @@ void MENU_Init(void)
     page = MENU_SELECT;
     cursor = 0;
     param_cursor = 0;
-    LCD_Fill(0, 0, 127, 159, BG_COLOR);
+    LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
     draw_select();
 }
 
@@ -67,12 +67,12 @@ void MENU_KeyHandler(uint8_t key)
             if (cursor < TASK_COUNT) {
                 TASK_Select(cursor);
                 page = MENU_RUNNING;
-                LCD_Fill(0, 0, 127, 159, BG_COLOR);
+                LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
                 draw_running();
             } else {
                 param_cursor = 0;
                 page = MENU_PARAM;
-                LCD_Fill(0, 0, 127, 159, BG_COLOR);
+                LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
                 draw_param();
             }
         }
@@ -97,7 +97,7 @@ void MENU_KeyHandler(uint8_t key)
             draw_param();
         } else if (key == 4) {
             page = MENU_SELECT;
-            LCD_Fill(0, 0, 127, 159, BG_COLOR);
+            LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
             draw_select();
         }
         break;
@@ -113,7 +113,7 @@ void MENU_KeyHandler(uint8_t key)
         } else if (key == 4) {
             TASK_Stop();
             page = MENU_SELECT;
-            LCD_Fill(0, 0, 127, 159, BG_COLOR);
+            LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
             draw_select();
         }
         break;
@@ -127,7 +127,7 @@ void MENU_KeyHandler(uint8_t key)
         } else if (key == 4) {
             TASK_Stop();
             page = MENU_SELECT;
-            LCD_Fill(0, 0, 127, 159, BG_COLOR);
+            LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
             draw_select();
         }
         break;
@@ -147,10 +147,10 @@ static void draw_running(void)
     /* 默认显示：任务名 + 速度 + 传感器条 */
     lcd_printf(0, TITLE_Y, TITLE_COLOR, BG_COLOR, "%s RUN",
                task_names[idx]);
-    lcd_printf(0, 26, TXT_COLOR, BG_COLOR,
+    lcd_printf(0, ITEM_Y0, TXT_COLOR, BG_COLOR,
                "Spd:%d L:%d R:%d", param_base_speed, speed_l, speed_r);
 		
-    lcd_printf(0, 46, TXT_COLOR, BG_COLOR, "Sns:");
+    lcd_printf(0, ITEM_Y0 + ITEM_H, TXT_COLOR, BG_COLOR, "Sns:");
     lcd_printf(0, HINT_Y, GRAY, BG_COLOR, "K3 Pause K4 Stop");
 }
 
@@ -172,8 +172,8 @@ void MENU_Refresh(void)
 
 static void draw_select(void)
 {
-    LCD_Fill(0, 0, 127, 18, BG_COLOR);
-    LCD_Fill(0, 140, 127, 159, BG_COLOR);
+    LCD_Fill(0, 0, LCD_W, 28, BG_COLOR);
+    LCD_Fill(0, HINT_Y, LCD_W, LCD_H, BG_COLOR);
     lcd_printf(0, TITLE_Y, TITLE_COLOR, BG_COLOR, "Task Select");
 
     for (uint8_t i = 0; i < TASK_COUNT; i++) {
@@ -195,8 +195,8 @@ static void draw_select(void)
 
 static void draw_param(void)
 {
-    LCD_Fill(0, 0, 127, 18, BG_COLOR);
-    LCD_Fill(0, 140, 127, 159, BG_COLOR);
+    LCD_Fill(0, 0, LCD_W, 28, BG_COLOR);
+    LCD_Fill(0, HINT_Y, LCD_W, LCD_H, BG_COLOR);
     lcd_printf(0, TITLE_Y, TITLE_COLOR, BG_COLOR, "Settings");
 
     char buf[16];

@@ -1,6 +1,6 @@
 /**
  * @file    lcd_port.c
- * @brief   ST7735 LCD 底层 — SPI 轮询命令 + DMA 批量像素
+ * @brief   ST7789 LCD 底层 — SPI 轮询命令 + DMA 批量像素
  * @note    SysConfig 已生成: SPI_LCD_INST(SPI1), DMA_LCD_TX_CHAN_ID(0)
  */
 #include "lcd_port.h"
@@ -41,22 +41,15 @@ void LCD_WR_DATA16(uint16_t dat)
 
 void LCD_Address_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
-    uint8_t x_offset, y_offset;
-
-    switch (USE_HORIZONTAL) {
-        case 0: x_offset = 2; y_offset = 1; break;
-        case 1: x_offset = 2; y_offset = 1; break;
-        case 2: x_offset = 1; y_offset = 2; break;
-        default: x_offset = 1; y_offset = 2; break;
-    }
+    /* ST7789 240x240: 无内部偏移, 直接映射 */
 
     LCD_WR_REG(0x2A);  /* CASET 列地址 */
-    LCD_WR_DATA16(x1 + x_offset);
-    LCD_WR_DATA16(x2 + x_offset);
+    LCD_WR_DATA16(x1);
+    LCD_WR_DATA16(x2);
 
     LCD_WR_REG(0x2B);  /* RASET 行地址 */
-    LCD_WR_DATA16(y1 + y_offset);
-    LCD_WR_DATA16(y2 + y_offset);
+    LCD_WR_DATA16(y1);
+    LCD_WR_DATA16(y2);
 
     LCD_WR_REG(0x2C);  /* RAMWR 开始写 GRAM */
 }
@@ -112,82 +105,72 @@ void LCD_Init(void)
     LCD_RES_Set();
     delay_ms(100);
 
-    /* ---- ST7735 初始化序列 ---- */
+    /* ---- ST7789 240x240 初始化序列 ---- */
+
+    LCD_WR_REG(0x01);   /* 软件复位 */
+    delay_ms(150);
 
     LCD_WR_REG(0x11);   /* 退出睡眠 */
     delay_ms(120);
 
-    /* 帧率控制 */
-    LCD_WR_REG(0xB1);
-    LCD_WR_DATA8(0x05); LCD_WR_DATA8(0x3C); LCD_WR_DATA8(0x3C);
-
-    LCD_WR_REG(0xB2);
-    LCD_WR_DATA8(0x05); LCD_WR_DATA8(0x3C); LCD_WR_DATA8(0x3C);
-
-    LCD_WR_REG(0xB3);
-    LCD_WR_DATA8(0x05); LCD_WR_DATA8(0x3C); LCD_WR_DATA8(0x3C);
-    LCD_WR_DATA8(0x05); LCD_WR_DATA8(0x3C); LCD_WR_DATA8(0x3C);
-
-    LCD_WR_REG(0xB4);   /* 点反转 */
-    LCD_WR_DATA8(0x03);
-
-    /* 电源设置 */
-    LCD_WR_REG(0xC0);
-    LCD_WR_DATA8(0x28); LCD_WR_DATA8(0x08); LCD_WR_DATA8(0x04);
-
-    LCD_WR_REG(0xC1);
-    LCD_WR_DATA8(0xC0);
-
-    LCD_WR_REG(0xC2);
-    LCD_WR_DATA8(0x0D); LCD_WR_DATA8(0x00);
-
-    LCD_WR_REG(0xC3);
-    LCD_WR_DATA8(0x8D); LCD_WR_DATA8(0x2A);
-
-    LCD_WR_REG(0xC4);
-    LCD_WR_DATA8(0x8D); LCD_WR_DATA8(0xEE);
-
-    LCD_WR_REG(0xC5);   /* VCOM */
-    LCD_WR_DATA8(0x1A);
-
-    /* 方向控制 (MADCTL) */
-    LCD_WR_REG(0x36);
-    switch (USE_HORIZONTAL) {
-        case 0: LCD_WR_DATA8(0x00); break;
-        case 1: LCD_WR_DATA8(0xC0); break;
-        case 2: LCD_WR_DATA8(0x70); break;
-        default: LCD_WR_DATA8(0xA0); break;
+    LCD_WR_REG(0x36);   /* MADCTL 方向控制 */
+    if (USE_HORIZONTAL == 0 || USE_HORIZONTAL == 1) {
+        LCD_WR_DATA8(0x00);
+    } else {
+        LCD_WR_DATA8(0x60);
     }
 
-    /* Gamma 正极性 */
-    LCD_WR_REG(0xE0);
-    LCD_WR_DATA8(0x04); LCD_WR_DATA8(0x22); LCD_WR_DATA8(0x07);
-    LCD_WR_DATA8(0x0A); LCD_WR_DATA8(0x2E); LCD_WR_DATA8(0x30);
-    LCD_WR_DATA8(0x25); LCD_WR_DATA8(0x2A); LCD_WR_DATA8(0x28);
-    LCD_WR_DATA8(0x26); LCD_WR_DATA8(0x2E); LCD_WR_DATA8(0x3A);
-    LCD_WR_DATA8(0x00); LCD_WR_DATA8(0x01); LCD_WR_DATA8(0x03);
-    LCD_WR_DATA8(0x13);
-
-    /* Gamma 负极性 */
-    LCD_WR_REG(0xE1);
-    LCD_WR_DATA8(0x04); LCD_WR_DATA8(0x16); LCD_WR_DATA8(0x06);
-    LCD_WR_DATA8(0x0D); LCD_WR_DATA8(0x2D); LCD_WR_DATA8(0x26);
-    LCD_WR_DATA8(0x23); LCD_WR_DATA8(0x27); LCD_WR_DATA8(0x27);
-    LCD_WR_DATA8(0x25); LCD_WR_DATA8(0x2D); LCD_WR_DATA8(0x3B);
-    LCD_WR_DATA8(0x00); LCD_WR_DATA8(0x01); LCD_WR_DATA8(0x04);
-    LCD_WR_DATA8(0x13);
-
-    /* 像素格式: 16-bit (RGB565) */
-    LCD_WR_REG(0x3A);
+    LCD_WR_REG(0x3A);   /* COLMOD: 16-bit RGB565 */
     LCD_WR_DATA8(0x05);
 
-    /* 开显示 */
-    LCD_WR_REG(0x29);
+    LCD_WR_REG(0xB2);   /* PORCTRL 前后廊 */
+    LCD_WR_DATA8(0x0C); LCD_WR_DATA8(0x0C); LCD_WR_DATA8(0x00);
+    LCD_WR_DATA8(0x33); LCD_WR_DATA8(0x33);
 
-    /* ---- 清屏 (背光开启前先刷黑，避免显示残影) ---- */
-    LCD_Fill(0, 0, LCD_W, LCD_H, BLACK);
+    LCD_WR_REG(0xB7);   /* GCTRL Gate控制 */
+    LCD_WR_DATA8(0x35);
+
+    LCD_WR_REG(0xBB);   /* VCOMS */
+    LCD_WR_DATA8(0x2B);
+
+    LCD_WR_REG(0xC0);   /* LCMCTRL */
+    LCD_WR_DATA8(0x2C);
+
+    LCD_WR_REG(0xC2);   /* VDVVRHEN */
+    LCD_WR_DATA8(0x01);
+
+    LCD_WR_REG(0xC3);   /* VRHS */
+    LCD_WR_DATA8(0x12);
+
+    LCD_WR_REG(0xC4);   /* VDVS */
+    LCD_WR_DATA8(0x20);
+
+    LCD_WR_REG(0xC6);   /* FRCTRL2 帧率 */
+    LCD_WR_DATA8(0x0F);
+
+    LCD_WR_REG(0xD0);   /* PWCTRL1 */
+    LCD_WR_DATA8(0xA4); LCD_WR_DATA8(0xA1);
+
+    LCD_WR_REG(0xE0);   /* PVGAMCTRL 正极性Gamma */
+    LCD_WR_DATA8(0xD0); LCD_WR_DATA8(0x04); LCD_WR_DATA8(0x0D);
+    LCD_WR_DATA8(0x11); LCD_WR_DATA8(0x13); LCD_WR_DATA8(0x2B);
+    LCD_WR_DATA8(0x3F); LCD_WR_DATA8(0x54); LCD_WR_DATA8(0x4C);
+    LCD_WR_DATA8(0x18); LCD_WR_DATA8(0x0D); LCD_WR_DATA8(0x0B);
+    LCD_WR_DATA8(0x1F); LCD_WR_DATA8(0x23);
+
+    LCD_WR_REG(0xE1);   /* NVGAMCTRL 负极性Gamma */
+    LCD_WR_DATA8(0xD0); LCD_WR_DATA8(0x04); LCD_WR_DATA8(0x0C);
+    LCD_WR_DATA8(0x11); LCD_WR_DATA8(0x13); LCD_WR_DATA8(0x2C);
+    LCD_WR_DATA8(0x3F); LCD_WR_DATA8(0x44); LCD_WR_DATA8(0x51);
+    LCD_WR_DATA8(0x2F); LCD_WR_DATA8(0x1F); LCD_WR_DATA8(0x1F);
+    LCD_WR_DATA8(0x20); LCD_WR_DATA8(0x23);
+
+    LCD_WR_REG(0x29);   /* 开显示 */
+    delay_ms(120);
+
+    /* ---- 清屏 白色 (测试用) ---- */
+    LCD_Fill(0, 0, LCD_W, LCD_H, WHITE);
 
     /* ---- 背光开 ---- */
     LCD_BLK_Set();
-		
 }

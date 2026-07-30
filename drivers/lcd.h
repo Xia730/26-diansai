@@ -1,6 +1,6 @@
 /**
  * @file    lcd.h
- * @brief   ST7735 LCD 应用层 — 绘图 + 文字 + 格式化输出
+ * @brief   ST7789 LCD 应用层 — 绘图 + 文字 + 格式化输出
  */
 #ifndef __LCD_H
 #define __LCD_H

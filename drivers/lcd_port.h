@@ -1,6 +1,6 @@
 /**
  * @file    lcd_port.h
- * @brief   ST7735 LCD 底层驱动 — 引脚定义、SPI+DMA API
+ * @brief   ST7789 LCD 底层驱动 — 引脚定义、SPI+DMA API
  * @note    命令/寄存器走轮询，像素数据走 DMA
  */
 #ifndef __LCD_PORT_H
@@ -13,15 +13,10 @@ extern "C" {
 #endif
 
 /* ========== 显示方向 ========== */
-#define USE_HORIZONTAL  1   /* 0/1=竖屏128x160  2/3=横屏160x128 */
+#define USE_HORIZONTAL  1   /* 0/1=竖屏240x240  2/3=横屏240x240 (方屏) */
 
-#if USE_HORIZONTAL == 0 || USE_HORIZONTAL == 1
-  #define LCD_W  128
-  #define LCD_H  160
-#else
-  #define LCD_W  160
-  #define LCD_H  128
-#endif
+#define LCD_W  240
+#define LCD_H  240
 
 /* ========== 引脚宏 (全部在 GPIOB) ========== */
 #define LCD_RES_Clr()  DL_GPIO_clearPins(SPI_LCD1_PORT, SPI_LCD1_RES_PIN)
@@ -34,7 +29,7 @@ extern "C" {
 #define LCD_BLK_Set()  DL_GPIO_setPins(SPI_LCD1_PORT, SPI_LCD1_BLK_PIN)
 
 /* ========== DMA ========== */
-#define LCD_DMA_BUF_SIZE  512   /* 256像素/块 (每像素2字节) */
+#define LCD_DMA_BUF_SIZE  1024  /* 512像素/块 (每像素2字节) */
 
 /* ========== 底层 API ========== */
 

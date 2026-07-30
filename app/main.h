@@ -12,9 +12,7 @@
 #include "maxicam.h"
 #include "motor/Motor.h"
 #include "ti_msp_dl_config.h"
-#include "zigbee.h"
 #include "bsp/interrupt.h"
-#include "imu660rb.h"
 
 /* ================================================
  *  按键变量
