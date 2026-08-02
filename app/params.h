@@ -12,23 +12,18 @@ extern char task_names[TASK_COUNT][NAME_LEN + 1];
 
 /* ── ★ 可调参数（菜单 Settings 页修改） ──
  *
- *  在你的 task_run() 里直接读这些变量，不用传参
  *  Settings → K1+  K2-  K3下一项  K4返回
  *
- *  常用场景：
- *    param_base_speed  基础速度
- *    param_turn_speed  转弯速度
- *    param_pid_p       P 系数（×100，150→1.50）
- *    param_pid_i       I 系数
- *    param_pid_d       D 系数
+ *    param_base_speed  任务1 基础速度
+ *    param_t3_speed    任务3 基础速度
+ *    param_trail_kp    循迹 KP（×100）
+ *    param_trail_kd    循迹 KD（×100）
  */
 extern int32_t param_base_speed;
-extern int32_t param_turn_speed;
-extern int32_t param_pid_p;
-extern int32_t param_pid_i;
-extern int32_t param_pid_d;
-extern int32_t param_lap_enc;
-#define PARAM_COUNT 6
+extern int32_t param_t3_speed;
+extern int32_t param_trail_kp;
+extern int32_t param_trail_kd;
+#define PARAM_COUNT 4
 
 /* ── 参数显示格式 ──
  *  FMT_INT  : 直接显示整数，如 500

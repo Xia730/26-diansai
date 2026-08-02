@@ -520,26 +520,6 @@
               <FilePath>..\drivers\lcd_port.h</FilePath>
             </File>
             <File>
-              <FileName>imu660rb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\imu660rb.c</FilePath>
-            </File>
-            <File>
-              <FileName>imu660rb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\imu660rb.h</FilePath>
-            </File>
-            <File>
-              <FileName>lsm6dsr_reg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\lsm6dsr_reg.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsm6dsr_reg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\lsm6dsr_reg.h</FilePath>
-            </File>
-            <File>
               <FileName>key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\drivers\key.c</FilePath>
@@ -569,26 +549,6 @@
               <FileType>5</FileType>
               <FilePath>..\drivers\trailing.h</FilePath>
             </File>
-            <File>
-              <FileName>zigbee.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\zigbee.c</FilePath>
-            </File>
-            <File>
-              <FileName>zigbee.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\zigbee.h</FilePath>
-            </File>
-            <File>
-              <FileName>maxicam.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\maxicam.c</FilePath>
-            </File>
-            <File>
-              <FileName>maxicam.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\maxicam.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -603,71 +563,6 @@
               <FileName>Motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\motor\Motor.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>fusion</GroupName>
-          <Files>
-            <File>
-              <FileName>Fusion.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\Fusion.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionAhrs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\Fusion\FusionAhrs.c</FilePath>
-            </File>
-            <File>
-              <FileName>FusionAhrs.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionAhrs.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionAxes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionAxes.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionCalibration.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionCalibration.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionCompass.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\Fusion\FusionCompass.c</FilePath>
-            </File>
-            <File>
-              <FileName>FusionCompass.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionCompass.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionConvention.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionConvention.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionMath.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionMath.h</FilePath>
-            </File>
-            <File>
-              <FileName>FusionOffset.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\drivers\Fusion\FusionOffset.c</FilePath>
-            </File>
-            <File>
-              <FileName>FusionOffset.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\FusionOffset.h</FilePath>
-            </File>
-            <File>
-              <FileName>LICENSE.md</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\drivers\Fusion\LICENSE.md</FilePath>
             </File>
           </Files>
         </Group>

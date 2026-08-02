@@ -52,4 +52,7 @@ uint8_t Trail_AllBlack(const uint8_t sensor[12]);
  */
 uint8_t Trail_DetectStopLine(const uint8_t sensor[12]);
 
+/* 传感器黑线可视化 — LCD 上画 12 路状态条 */
+void Trail_DrawSensorBar(const uint8_t sensor[12], uint16_t y);
+
 #endif

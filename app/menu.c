@@ -7,6 +7,9 @@
 
 extern int32_t speed_l, speed_r;
 extern volatile int32_t enc_count_l, enc_count_r;
+extern volatile uint32_t sys_tick;
+extern volatile uint8_t g_paused;
+extern uint32_t g_pause_accum, g_pause_start;
 #include <stdio.h>
 #include <string.h>
 
@@ -105,12 +108,17 @@ void MENU_KeyHandler(uint8_t key)
     /* ──── 运行中 ──── */
     case MENU_RUNNING:
         if (key == 3) {
-            page = MENU_PAUSED;
+            /* 暂停: 停电机, 冻结计时 */
             g_task_run = 0;
+            g_paused = 1;
+            g_pause_start = sys_tick;
             Motor_Control(1, 0);
             Motor_Control(2, 0);
             lcd_printf(0, TITLE_Y, RED, BG_COLOR, "  PAUSED  ");
         } else if (key == 4) {
+            /* 停止: 回到菜单 */
+            g_paused = 0;
+            g_pause_accum = 0;
             TASK_Stop();
             page = MENU_SELECT;
             LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
@@ -121,10 +129,15 @@ void MENU_KeyHandler(uint8_t key)
     /* ──── 暂停 ──── */
     case MENU_PAUSED:
         if (key == 3) {
-            page = MENU_RUNNING;
+            /* 恢复: 累计暂停时间 */
+            g_pause_accum += sys_tick - g_pause_start;
+            g_pause_start = 0;
+            g_paused = 0;
             g_task_run = 1;
-            draw_running();
         } else if (key == 4) {
+            /* 停止: 结算暂停时间, 回到菜单 */
+            g_pause_accum += sys_tick - g_pause_start;
+            g_paused = 0;
             TASK_Stop();
             page = MENU_SELECT;
             LCD_Fill(0, 0, LCD_W, LCD_H, BG_COLOR);
@@ -157,8 +170,8 @@ static void draw_running(void)
 void MENU_Refresh(void)
 {
     switch (page) {
-    case MENU_RUNNING:
     case MENU_PAUSED:
+    case MENU_RUNNING:
         draw_running();
         break;
     default:

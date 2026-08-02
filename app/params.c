@@ -26,11 +26,10 @@ char task_names[TASK_COUNT][NAME_LEN + 1] = {
  *    pid_d       — PID微分系数（×100，5=0.05）
  * ================================================ */
 int32_t param_base_speed = 600;
-int32_t param_turn_speed = 300;
-int32_t param_pid_p = 150;
-int32_t param_pid_i = 10;
-int32_t param_pid_d = 5;
-int32_t param_lap_enc = 10000;
+int32_t param_t3_speed   = 470;
+int32_t param_trail_kp   = 1850;   /* ×100, 18.50 */
+int32_t param_trail_kd   = 200;    /* ×100, 2.00 */
+
 
 /* ================================================
  *  参数定义表
@@ -47,11 +46,9 @@ int32_t param_lap_enc = 10000;
  * ================================================ */
 const ParamDef param_table[PARAM_COUNT] = {
     { "Speed",   &param_base_speed, 0, 3000, 10, FMT_INT },
-    { "TurnSpd", &param_turn_speed, 0, 999, 10, FMT_INT },
-    { "PID P",   &param_pid_p,      0, 1000, 5, FMT_DEC2 },
-    { "PID I",   &param_pid_i,      0, 500, 5, FMT_DEC2 },
-    { "PID D",   &param_pid_d,      0, 500, 5, FMT_DEC2 },
-    { "LapEnc",  &param_lap_enc,   100, 50000, 100, FMT_INT },
+    { "T3 Spd",  &param_t3_speed,   0, 3000, 10, FMT_INT },
+    { "Trl KP",  &param_trail_kp,   0, 10000, 100, FMT_DEC2 },
+    { "Trl KD",  &param_trail_kd,   0, 5000, 100, FMT_DEC2 },
 };
 
 /* ================================================

@@ -58,4 +58,9 @@ volatile int32_t speed_l = 0;
 volatile int32_t speed_r = 0;
 volatile int32_t enc_count_l = 0;
 volatile int32_t enc_count_r = 0;
+
+/* 暂停控制 */
+volatile uint8_t g_paused = 0;        /* 1=暂停中 */
+uint32_t g_pause_accum = 0;           /* 累计暂停ms */
+uint32_t g_pause_start = 0;           /* 本次暂停开始tick */
 #endif

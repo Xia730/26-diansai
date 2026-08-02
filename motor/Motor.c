@@ -79,51 +79,60 @@ void Motor_Control(uint8_t channel, int16_t speed)
  * ================================================ */
 #define KP_SPEED  0.8f  //0.7
 #define KI_SPEED  0.15f 	//0.15
-#define KD_SPEED  0.0f
+#define KD_SPEED  0.1f
 #define SP_DT     2
+
+static uint32_t sp_last_tick = 0;
+static int32_t  sp_pwm_l = 0, sp_pwm_r = 0;
+static int32_t  sp_prev_err_l = 0, sp_prev_err_r = 0;
+static int32_t  sp_prev2_err_l = 0, sp_prev2_err_r = 0;
+
+void Motor_ResetPID(void)
+{
+    sp_last_tick = 0;
+    sp_pwm_l = 0; sp_pwm_r = 0;
+    sp_prev_err_l = 0; sp_prev_err_r = 0;
+    sp_prev2_err_l = 0; sp_prev2_err_r = 0;
+}
 
 void Motor_SpeedLoop(int16_t target_l, int16_t target_r, uint32_t tick_ms)
 {
-    static uint32_t last_tick = 0;
-    static int32_t pwm_l = 0, pwm_r = 0;
-    static int32_t prev_err_l = 0, prev_err_r = 0;
-    static int32_t prev2_err_l = 0, prev2_err_r = 0;
 
     extern int32_t speed_l, speed_r;
 
-    if (tick_ms - last_tick < SP_DT) return;
-    last_tick = tick_ms;
+    if (tick_ms - sp_last_tick < SP_DT) return;
+    sp_last_tick = tick_ms;
 
     /* ── 左轮 ── */
     int32_t err_l = (int32_t)target_l - speed_l;
     int32_t delta_l = (int32_t)(
-        KP_SPEED * (err_l - prev_err_l)
+        KP_SPEED * (err_l - sp_prev_err_l)
       + KI_SPEED * err_l
-      + KD_SPEED * (err_l - 2 * prev_err_l + prev2_err_l)
+      + KD_SPEED * (err_l - 2 * sp_prev_err_l + sp_prev2_err_l)
     );
     if (delta_l > 100) delta_l = 100;
     if (delta_l < -100) delta_l = -100;
-    pwm_l += delta_l;
-    if (pwm_l > 999) pwm_l = 999;
-    if (pwm_l < -999) pwm_l = -999;
-    prev2_err_l = prev_err_l;
-    prev_err_l = err_l;
-    Motor_Control(1, (int16_t)pwm_l);
+    sp_pwm_l += delta_l;
+    if (sp_pwm_l > 999) sp_pwm_l = 999;
+    if (sp_pwm_l < -999) sp_pwm_l = -999;
+    sp_prev2_err_l = sp_prev_err_l;
+    sp_prev_err_l = err_l;
+    Motor_Control(1, (int16_t)sp_pwm_l);
 
     /* ── 右轮 ── */
     int32_t err_r = (int32_t)target_r - speed_r;
     int32_t delta_r = (int32_t)(
-        KP_SPEED * (err_r - prev_err_r)
+        KP_SPEED * (err_r - sp_prev_err_r)
       + KI_SPEED * err_r
-      + KD_SPEED * (err_r - 2 * prev_err_r + prev2_err_r)
+      + KD_SPEED * (err_r - 2 * sp_prev_err_r + sp_prev2_err_r)
     );
     if (delta_r > 100) delta_r = 100;
     if (delta_r < -100) delta_r = -100;
-    pwm_r += delta_r;
-    if (pwm_r > 999) pwm_r = 999;
-    if (pwm_r < -999) pwm_r = -999;
-    prev2_err_r = prev_err_r;
-    prev_err_r = err_r;
-    Motor_Control(2, (int16_t)pwm_r);
+    sp_pwm_r += delta_r;
+    if (sp_pwm_r > 999) sp_pwm_r = 999;
+    if (sp_pwm_r < -999) sp_pwm_r = -999;
+    sp_prev2_err_r = sp_prev_err_r;
+    sp_prev_err_r = err_r;
+    Motor_Control(2, (int16_t)sp_pwm_r);
 }
 

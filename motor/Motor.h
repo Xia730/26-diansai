@@ -18,5 +18,6 @@ void Motor_Control(uint8_t channel, int16_t speed);
  *  PI 系数为固定值（define 在 Motor.c）
  */
 void Motor_SpeedLoop(int16_t target_l, int16_t target_r, uint32_t tick_ms);
+void Motor_ResetPID(void);
 
 #endif

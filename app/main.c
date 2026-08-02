@@ -53,21 +53,21 @@ int main(void)
 		NVIC_EnableIRQ(UART0_INST_INT_IRQN);
 		NVIC_EnableIRQ(TIMER_0_INST_INT_IRQN);
 		NVIC_EnableIRQ(TIMER_1_INST_INT_IRQN);
-		
+
 		Interrupt_Init();
 
 		DL_TimerG_startCounter(PWM_A_INST);
 		DL_TimerG_startCounter(PWM_B_INST);
-	
-		DL_Timer_startCounter(TIMER_0_INST);
+
+		DL_TimerG_startCounter(TIMER_0_INST);
 		DL_TimerG_startCounter(TIMER_1_INST);
-		
+
 		Motor_Control(1, 0);
 		Motor_Control(2, 0);
-	
-	
+
+
     while (1) {
-			
+
         /* ── 高速控制：每次循环都跑 ──
          * task->run() 不阻塞，几微秒就返回
          * 任务内部用 sys_tick 或 bin_ready 自己控制节奏
@@ -90,6 +90,7 @@ int main(void)
 
             MENU_Refresh();
        }
+
     }
 }
 
@@ -101,9 +102,9 @@ void TIMER_0_INST_IRQHandler(void)
     switch (DL_TimerG_getPendingInterrupt(TIMER_0_INST)) {
         case DL_TIMER_IIDX_ZERO:
             sys_tick++;
-            
+
             if (sys_tick % 10 == 0) g_10ms_flag = 1;
-				//if (sys_tick % 10 == 0) my_printf(UART1,"%0.1f\n",speed_l);;
+            DL_TimerG_clearInterruptStatus(TIMER_0_INST, DL_TIMER_IIDX_ZERO);
             break;
         default:
             break;
@@ -117,8 +118,7 @@ void TIMER_1_INST_IRQHandler(void)
         {
             ans_ten_us++;
             speed_check_cnt++;
-						//yaw = Angle_180_to_360(euler.angle.yaw);
-						
+
             if(speed_check_cnt >= SPEED_TIMEOUT)
             {
                 speed_check_cnt = 0;
@@ -134,6 +134,8 @@ void TIMER_1_INST_IRQHandler(void)
                     speed_r = 0;
                 }
             }
+            DL_TimerG_clearInterruptStatus(TIMER_1_INST, DL_TIMER_IIDX_ZERO);
+            break;
         }
         default:
             break;

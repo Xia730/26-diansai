@@ -1,4 +1,6 @@
 #include "trailing.h"
+#include "../app/params.h"
+#include "lcd.h"
 
 volatile uint8_t bin_ready=0 ;
 volatile uint8_t buf_index=0 ;
@@ -94,15 +96,12 @@ void UART3_SendStates(volatile uint8_t bin_array[12])
  *    KP 调转向力度（太大=蛇形，太小=冲出）
  *    KD 抑制震荡（一般为 0）
  * ================================================ */
-#define TRAIL_KP          22.0f
-#define TRAIL_KD           2.0f
 #define TRAIL_DT           10
 #define MAX_CORRECTION     1000
 #define LOST_MAX            3
 #define LOST_SPIN            400
 
-static const int8_t weight[12] = {-24, -18, -14, -10, -4, -2,
-                                    2,   4,  10,  14, 18, 24};
+static const int8_t weight[12] = {-24,-18,-14,-11,-6,-2, 2,6,11,14,18,24};
 
 int16_t Trail_Steering_Compute(const uint8_t sensor[12], uint32_t tick_ms)
 {
@@ -143,7 +142,8 @@ int16_t Trail_Steering_Compute(const uint8_t sensor[12], uint32_t tick_ms)
     /* ── Step2: PD 控制 ── */
     float position = (float)sum / (float)count;
     float delta    = position - last_position;
-    float corr_f   = TRAIL_KP * position + TRAIL_KD * delta;
+    float corr_f   = (param_trail_kp / 100.0f) * position
+                    + (param_trail_kd / 100.0f) * delta;
 
     correction = -(int32_t)corr_f;
 
@@ -191,3 +191,45 @@ uint8_t Trail_DetectStopLine(const uint8_t sensor[12])
     return 0;
 }
 
+
+/* ================================================
+ *  传感器黑线可视化 — LCD 上画 12 路状态条
+ *
+ *  每路传感器用一个小方块表示：
+ *    填充黑色 = 检测到黑线 (sensor[i]=1)
+ *    填充白色 = 白底       (sensor[i]=0)
+ *    灰色边框 = 统一外框
+ *
+ *  布局：12 个方块居中排列，每块 16x16，间距 2px
+ * ================================================ */
+void Trail_DrawSensorBar(const uint8_t sensor[12], uint16_t y)
+{
+	uint8_t  i;
+	uint16_t x, idx_pos;
+	uint16_t block_w  = 16;
+	uint16_t block_h  = 16;
+	uint16_t gap      = 2;
+	uint16_t start_x  = (LCD_W - (12 * block_w + 11 * gap)) / 2;  /* ~13 */
+	uint16_t bar_top  = y + 22;   /* 留 22px 给文字行 */
+
+	/* --- 标题行 --- */
+	lcd_printf(0, y, BLACK, WHITE, "Sensors:");
+
+	/* --- 索引号（1~12，标在方块上方）--- */
+	for (i = 0; i < 12; i++) {
+		x = start_x + i * (block_w + gap);
+		idx_pos = x + 4;
+		LCD_ShowChar(idx_pos, bar_top - 12, '1' + i, GRAY, WHITE, 16, 0);
+	}
+
+	/* --- 12 个方块 --- */
+	for (i = 0; i < 12; i++) {
+		x = start_x + i * (block_w + gap);
+
+		/* 填充：黑线=黑色，白底=白色 */
+		uint16_t fill = sensor[i] ? BLACK : WHITE;
+
+		LCD_Fill(x, bar_top, x + block_w, bar_top + block_h, fill);
+		LCD_DrawRectangle(x, bar_top, x + block_w, bar_top + block_h, GRAY);
+	}
+}

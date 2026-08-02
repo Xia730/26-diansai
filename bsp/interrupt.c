@@ -158,21 +158,21 @@ void GROUP1_IRQHandler(void)
     switch (DL_Interrupt_getPendingGroup(DL_INTERRUPT_GROUP_1)) {
 
     /* ================= GPIOA — IMU660RB ================= */
-    #if defined GPIO_IMU660RB_INT_IIDX
-    case GPIO_IMU660RB_INT_IIDX:
-    {
-        uint32_t pending = DL_GPIO_getPendingInterrupt(GPIOA);
+//    #if defined GPIO_IMU660RB_INT_IIDX
+//    case GPIO_IMU660RB_INT_IIDX:
+//    {
+//        uint32_t pending = DL_GPIO_getPendingInterrupt(GPIOA);
 
-        #if defined GPIO_IMU660RB_PIN_IMU660RB_INT1_IIDX
-        if (pending == GPIO_IMU660RB_PIN_IMU660RB_INT1_IIDX) {
-            Read_IMU660RB();
-            DL_GPIO_clearInterruptStatus(GPIO_IMU660RB_PORT,
-                GPIO_IMU660RB_PIN_IMU660RB_INT1_PIN);
-        }
-        #endif
-        break;
-    }
-    #endif
+//        #if defined GPIO_IMU660RB_PIN_IMU660RB_INT1_IIDX
+//        if (pending == GPIO_IMU660RB_PIN_IMU660RB_INT1_IIDX) {
+//            Read_IMU660RB();
+//            DL_GPIO_clearInterruptStatus(GPIO_IMU660RB_PORT,
+//                GPIO_IMU660RB_PIN_IMU660RB_INT1_PIN);
+//        }
+//        #endif
+//        break;
+//    }
+//    #endif
 
     /* ================= GPIOB — 编码器 ================= */
     #if defined GPIO_MULTIPLE_GPIOB_INT_IIDX
